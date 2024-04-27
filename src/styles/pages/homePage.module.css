@@ -1,0 +1,54 @@
+.homePageMain {
+  padding: 5rem 4rem;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 2rem 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 2rem;
+}
+
+.pageContentContainer {
+  padding: 2rem 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.projectInfoLink {
+  margin-top: 3rem;
+}
+
+.pageIllustration {
+  width: 100%;
+  height: auto;
+  -webkit-animation: animatedImg 5s linear infinite;
+  animation: animatedImg 5s linear infinite;
+}
+
+@-webkit-keyframes animatedImg {
+  0%,
+  100% {
+    -webkit-transform: translateY(15px);
+    transform: translateY(15px);
+  }
+  50% {
+    -webkit-transform: translateY(-15px);
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes animatedImg {
+  0%,
+  100% {
+    -webkit-transform: translateY(15px);
+    transform: translateY(15px);
+  }
+  50% {
+    -webkit-transform: translateY(-15px);
+    transform: translateY(-15px);
+  }
+}

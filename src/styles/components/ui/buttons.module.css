@@ -1,0 +1,50 @@
+.buttons {
+  height: 2.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+.buttons::after {
+  content: "";
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 0;
+  margin: 0 auto;
+  -webkit-transition: width 0.2s linear;
+  -o-transition: width 0.2s linear;
+  transition: width 0.2s linear;
+}
+
+.buttons:hover::after {
+  width: 100%;
+  -webkit-transition: width 0.6s cubic-bezier(0.52, 1.64, 0.37, 0.66);
+  -o-transition: width 0.6s cubic-bezier(0.52, 1.64, 0.37, 0.66);
+  transition: width 0.6s cubic-bezier(0.52, 1.64, 0.37, 0.66);
+}
+
+.blackButton {
+  width: 11.5rem;
+  padding: 0.5rem 1rem;
+  background: #2b2d2f;
+  color: #ffffff;
+}
+
+.blackButton::after {
+  background: #242424;
+}
+
+.purpleButton {
+  padding: 0.5rem 1.25rem;
+  background: #8c80f6;
+  color: #ffffff;
+}
+
+.purpleButton::after {
+  background: #806af6;
+}

@@ -1,0 +1,58 @@
+.headerBar {
+  padding: 0.5rem 4rem;
+  background: #ffffff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  border-bottom: 1px solid hsla(210, 4%, 18%, 0.05);
+}
+
+.headerBarLogo {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #eb572c !important;
+}
+
+.headerBarLogoImg {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-right: 2px;
+}
+
+.headerBarLogoImg img {
+  width: 2.5rem;
+  height: 2.5rem;
+  -o-object-fit: contain;
+  object-fit: contain;
+}
+
+.headerBarGetDemoLink {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
