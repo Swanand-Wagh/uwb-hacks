@@ -7,10 +7,12 @@ export interface IAudioVisualizerComponentProps {
 }
 
 export interface IAudioControlComponentProps {
-  transcript: string;
+  tutorTranscript: string;
   isSubmitting: boolean;
-  setTranscript: React.Dispatch<React.SetStateAction<string>>;
+  setTutorTranscript: React.Dispatch<React.SetStateAction<string>>;
   aiAudio: HTMLAudioElement | null;
   setAiAudio: React.Dispatch<React.SetStateAction<HTMLAudioElement | null>>;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+  isGradingTime: boolean;
+  setIsGradingTime: React.Dispatch<React.SetStateAction<boolean>>;
 }

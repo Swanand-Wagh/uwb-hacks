@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import GetDemoStyles from "@/styles/pages/getDemo.module.css";
 import { AudioControl } from "@/components/audio";
 import { ICurrentFormProperties, IFormControlErrors } from "@/interfaces/form";
-import { PurpleButton } from "@/components/ui";
+import { BlackButton, PurpleButton } from "@/components/ui";
 import { Loader } from "@/components/common";
+import { Link } from "react-router-dom";
 
 export const GetDemo: React.FC = (): JSX.Element => {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [controlErrors, setControlErrors] = useState<IFormControlErrors>(
     {} as IFormControlErrors
   );
-  const [transcript, setTranscript] = useState<string>("");
+  const [tutorTranscript, setTutorTranscript] = useState<string>("");
   const [aiAudio, setAiAudio] = useState<HTMLAudioElement | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isGradingTime, setIsGradingTime] = useState<boolean>(false);
 
   const validateContent = (content: string): boolean => {
     const trimmedContent = content.trim();
@@ -125,10 +127,12 @@ export const GetDemo: React.FC = (): JSX.Element => {
 
     try {
       const audio = await getAudioFile(content, tutor);
-      const transcript = await getTranscript();
-
-      setTranscript(transcript);
       setAiAudio(audio);
+
+      if (audio) {
+        const tutorTranscript = await getTranscript();
+        setTutorTranscript(tutorTranscript);
+      }
 
       currentForm.reset();
       setControlErrors({} as IFormControlErrors);
@@ -146,12 +150,14 @@ export const GetDemo: React.FC = (): JSX.Element => {
       <main className={GetDemoStyles.getDemoMain}>
         {formSubmitted ? (
           <AudioControl
-            transcript={transcript}
-            setTranscript={setTranscript}
+            tutorTranscript={tutorTranscript}
+            setTutorTranscript={setTutorTranscript}
             aiAudio={aiAudio}
             setAiAudio={setAiAudio}
             setIsSubmitting={setIsSubmitting}
             isSubmitting={isSubmitting}
+            isGradingTime={isGradingTime}
+            setIsGradingTime={setIsGradingTime}
           />
         ) : (
           <form
@@ -215,6 +221,19 @@ export const GetDemo: React.FC = (): JSX.Element => {
               Submit
             </PurpleButton>
           </form>
+        )}
+        {isGradingTime && (
+          <Link to="/my-report">
+            <div
+              style={{
+                display: "flex",
+                marginTop: "2rem",
+                justifyContent: "center",
+              }}
+            >
+              <BlackButton>Check Your Report</BlackButton>
+            </div>
+          </Link>
         )}
       </main>
     </React.Fragment>

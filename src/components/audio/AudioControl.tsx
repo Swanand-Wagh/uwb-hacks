@@ -14,12 +14,13 @@ import { IAudioControlComponentProps } from "@/interfaces/audioComponents";
 import { Loader } from "../common";
 
 export const AudioControl: React.FC<IAudioControlComponentProps> = ({
-  transcript,
+  tutorTranscript,
   aiAudio,
   setAiAudio,
-  setTranscript,
+  setTutorTranscript,
   setIsSubmitting,
   isSubmitting,
+  setIsGradingTime,
 }): JSX.Element => {
   const {
     mediaURL,
@@ -35,6 +36,7 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAiAnimation, setShowAiAnimation] = useState<boolean>(false);
   const [recordedAudio, setRecordedAudio] = useState<any>(null);
+  const [studentTranscript, setStudentTranscript] = useState<string>("");
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   const convert = async (mediaURL: any) => {
@@ -143,35 +145,53 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
     };
   }, [aiAudio, setAiAudio]);
 
-  const getTranscript = async () => {
-    const response = await fetch(
-      "http://localhost:8080/api/studentTranscript",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  const getTranscript = async (url: string) => {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     const data = await response.text();
     return data;
   };
 
   const getAudioFile = async () => {
-    const response = await fetch(
-      "http://localhost:8080/api/sendStudentResponse",
-      {
-        method: "POST",
-        body: recordedAudio,
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/sendStudentResponse",
+        {
+          method: "POST",
+          body: recordedAudio,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch audio file");
       }
-    );
 
-    const wavFile = await response.blob();
-    const audioURL = URL.createObjectURL(wavFile);
+      const wavFile = await response.blob();
+      const audioURL = URL.createObjectURL(wavFile);
 
-    const audio = new Audio(audioURL);
-    return audio;
+      const audio = new Audio(audioURL);
+      return audio;
+    } catch (error) {
+      console.error("Error fetching audio file:", error);
+      setTutorTranscript("");
+    }
+  };
+
+  const checkIsGradingTime = async () => {
+    const response = await fetch("http://localhost:8080/api/isGradingTime", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    setIsGradingTime(data);
   };
 
   const sendAudio = async () => {
@@ -179,14 +199,25 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
 
     try {
       const audio = await getAudioFile();
-      const transcript = await getTranscript();
+      audio && setAiAudio(audio);
 
-      setTranscript(transcript);
-      setAiAudio(audio);
+      if (audio) {
+        const studentTranscript = await getTranscript(
+          "http://localhost:8080/api/studentTranscript"
+        );
+        setStudentTranscript(studentTranscript);
+
+        const tutorTranscript = await getTranscript(
+          "http://localhost:8080/api/tutorTranscript"
+        );
+        setTutorTranscript(tutorTranscript);
+      }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setIsSubmitting(false);
+      handleDeleteConfirm();
+      checkIsGradingTime();
     }
   };
 
@@ -226,19 +257,21 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
               ></div>
             </div>
           </div>
-          <p className={AudioControlStyles.transcriptContainer}>{transcript}</p>
+          <p className={AudioControlStyles.transcriptContainer}>
+            {tutorTranscript}
+          </p>
         </section>
 
         <section
           aria-labelledby="audioControlHeading"
           className={`${AudioControlStyles.audioSections} ${AudioControlStyles.audioControlSection}`}
         >
-          <h1
+          {/* <h1
             id="audioControlHeading"
             className={AudioControlStyles.audioControlHeading}
           >
             Press the microphone to begin recording
-          </h1>
+          </h1> */}
           <div className={AudioControlStyles.audioVisualContainer}>
             {recordingState === "idle" && (
               <button
@@ -301,6 +334,11 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
           )}
           {mediaURL && (
             <AudioVisualizer mediaURL={mediaURL} isPlaying={isPlaying} />
+          )}
+          {studentTranscript && (
+            <p className={AudioControlStyles.transcriptContainer}>
+              {studentTranscript}
+            </p>
           )}
         </section>
       </div>
