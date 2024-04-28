@@ -40,10 +40,10 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
     });
 
     const formData = new FormData();
-    formData.append("audio", audioFile);
+    formData.append("file", audioFile);
 
     setRecordedAudio(formData);
-    console.log(audioFile);
+    console.log(mediaURL, audioBlob);
   };
 
   useEffect(() => {
@@ -159,9 +159,6 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
         "http://localhost:8080/api/sendStudentResponse",
         {
           method: "POST",
-          headers: {
-            "Content-Type": `multipart/form-data; boundary=${boundary}`,
-          },
           body: recordedAudio,
         }
       );
