@@ -8,7 +8,9 @@ export interface IAudioVisualizerComponentProps {
 
 export interface IAudioControlComponentProps {
   transcript: string;
+  isSubmitting: boolean;
   setTranscript: React.Dispatch<React.SetStateAction<string>>;
   aiAudio: HTMLAudioElement | null;
   setAiAudio: React.Dispatch<React.SetStateAction<HTMLAudioElement | null>>;
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
 }

@@ -150,6 +150,8 @@ export const GetDemo: React.FC = (): JSX.Element => {
             setTranscript={setTranscript}
             aiAudio={aiAudio}
             setAiAudio={setAiAudio}
+            setIsSubmitting={setIsSubmitting}
+            isSubmitting={isSubmitting}
           />
         ) : (
           <form

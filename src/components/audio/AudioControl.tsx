@@ -11,11 +11,15 @@ import {
 } from "react-icons/fi";
 import { AudioVisualizer } from "./AudioVisualizer";
 import { IAudioControlComponentProps } from "@/interfaces/audioComponents";
+import { Loader } from "../common";
 
 export const AudioControl: React.FC<IAudioControlComponentProps> = ({
   transcript,
   aiAudio,
   setAiAudio,
+  setTranscript,
+  setIsSubmitting,
+  isSubmitting,
 }): JSX.Element => {
   const {
     mediaURL,
@@ -139,42 +143,56 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
     };
   }, [aiAudio, setAiAudio]);
 
-  function generateBoundary() {
-    return (
-      "---------------------------" + Math.random().toString(36).substring(2)
+  const getTranscript = async () => {
+    const response = await fetch(
+      "http://localhost:8080/api/studentTranscript",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
-  }
+
+    const data = await response.text();
+    return data;
+  };
+
+  const getAudioFile = async () => {
+    const response = await fetch(
+      "http://localhost:8080/api/sendStudentResponse",
+      {
+        method: "POST",
+        body: recordedAudio,
+      }
+    );
+
+    const wavFile = await response.blob();
+    const audioURL = URL.createObjectURL(wavFile);
+
+    const audio = new Audio(audioURL);
+    return audio;
+  };
 
   const sendAudio = async () => {
+    setIsSubmitting(true);
+
     try {
-      if (!recordedAudio) {
-        console.error("No recorded audio available");
-        return;
-      }
+      const audio = await getAudioFile();
+      const transcript = await getTranscript();
 
-      console.log(recordedAudio);
-      const boundary = generateBoundary();
-
-      const response = await fetch(
-        "http://localhost:8080/api/sendStudentResponse",
-        {
-          method: "POST",
-          body: recordedAudio,
-        }
-      );
-
-      if (response.ok) {
-        console.log("Response:", response);
-      } else {
-        console.error("Failed to upload file");
-      }
+      setTranscript(transcript);
+      setAiAudio(audio);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <React.Fragment>
+      {isSubmitting && <Loader />}
       <div className={AudioControlStyles.audioControlMain}>
         <section
           className={`${AudioControlStyles.audioSections} ${AudioControlStyles.aiAudioSection}`}
