@@ -4,9 +4,8 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import { GetDemo, HomePage } from "./pages";
+import { GetDemo, HomePage, MyReport } from "./pages";
 import { SmartAppLayout } from "./components/layouts/SmartAppLayout";
-import MyReport from "./pages/MyReport";
 
 const appRouter = createBrowserRouter([
   {
