@@ -14,7 +14,6 @@ import { IAudioControlComponentProps } from "@/interfaces/audioComponents";
 
 export const AudioControl: React.FC<IAudioControlComponentProps> = ({
   transcript,
-  setTranscript,
   aiAudio,
   setAiAudio,
 }): JSX.Element => {
@@ -31,6 +30,21 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAiAnimation, setShowAiAnimation] = useState<boolean>(false);
+  const [recordedAudio, setRecordedAudio] = useState<any>(null);
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  const convert = async (mediaURL: any) => {
+    const audioBlob = await fetch(mediaURL).then((r) => r.blob());
+    const audioFile = new File([audioBlob], "voice.wav", {
+      type: "audio/wav",
+    });
+
+    const formData = new FormData();
+    formData.append("audio", audioFile);
+
+    setRecordedAudio(formData);
+    console.log(audioFile);
+  };
 
   useEffect(() => {
     if (audioRef.current) {
@@ -40,6 +54,8 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
 
     if (mediaURL) {
       const audioElement = new Audio(mediaURL);
+      convert(mediaURL);
+
       audioElement.addEventListener("ended", () => setIsPlaying(false));
       audioRef.current = audioElement;
 
@@ -122,6 +138,43 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
       }
     };
   }, [aiAudio, setAiAudio]);
+
+  function generateBoundary() {
+    return (
+      "---------------------------" + Math.random().toString(36).substring(2)
+    );
+  }
+
+  const sendAudio = async () => {
+    try {
+      if (!recordedAudio) {
+        console.error("No recorded audio available");
+        return;
+      }
+
+      console.log(recordedAudio);
+      const boundary = generateBoundary();
+
+      const response = await fetch(
+        "http://localhost:8080/api/sendStudentResponse",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${boundary}`,
+          },
+          body: recordedAudio,
+        }
+      );
+
+      if (response.ok) {
+        console.log("Response:", response);
+      } else {
+        console.error("Failed to upload file");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <React.Fragment>
@@ -214,6 +267,7 @@ export const AudioControl: React.FC<IAudioControlComponentProps> = ({
                   id="send-audio"
                   className={`${AudioControlStyles.audioControlBtns} ${AudioControlStyles.audioSendBtn}`}
                   aria-label="Send recording"
+                  onClick={sendAudio}
                 >
                   <FiSend />
                 </button>

@@ -3,6 +3,7 @@ import GetDemoStyles from "@/styles/pages/getDemo.module.css";
 import { AudioControl } from "@/components/audio";
 import { ICurrentFormProperties, IFormControlErrors } from "@/interfaces/form";
 import { PurpleButton } from "@/components/ui";
+import { Loader } from "@/components/common";
 
 export const GetDemo: React.FC = (): JSX.Element => {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
@@ -11,6 +12,7 @@ export const GetDemo: React.FC = (): JSX.Element => {
   );
   const [transcript, setTranscript] = useState<string>("");
   const [aiAudio, setAiAudio] = useState<HTMLAudioElement | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const validateContent = (content: string): boolean => {
     const trimmedContent = content.trim();
@@ -108,6 +110,7 @@ export const GetDemo: React.FC = (): JSX.Element => {
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
     const currentForm = event.currentTarget as typeof event.currentTarget &
       ICurrentFormProperties;
 
@@ -115,13 +118,15 @@ export const GetDemo: React.FC = (): JSX.Element => {
     const tutor = currentForm.tutor.value;
 
     const isValid = validateForm(content, tutor);
-    if (!isValid) return;
+    if (!isValid) {
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const audio = await getAudioFile(content, tutor);
       const transcript = await getTranscript();
 
-      console.log(transcript);
       setTranscript(transcript);
       setAiAudio(audio);
 
@@ -130,71 +135,86 @@ export const GetDemo: React.FC = (): JSX.Element => {
       setFormSubmitted(true);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <main className={GetDemoStyles.getDemoMain}>
-      {formSubmitted ? (
-        <AudioControl
-          aiAudio={aiAudio}
-          transcript={transcript}
-          setAiAudio={setAiAudio}
-          setTranscript={setTranscript}
-        />
-      ) : (
-        <form
-          noValidate
-          autoComplete="off"
-          onSubmit={handleFormSubmit}
-          className={GetDemoStyles.formBody}
-        >
-          <div className={GetDemoStyles.formControlContainer}>
-            <label htmlFor="content" className={GetDemoStyles.formControlLabel}>
-              Enter Content
-            </label>
-            <textarea
-              name="content"
-              id="content"
-              placeholder="Enter content..."
-              required
-              className={`${GetDemoStyles.formControl} ${
-                controlErrors.content && GetDemoStyles.controlError
-              }`}
-              onInput={(event) => validateContent(event.currentTarget.value)}
-            />
-            {controlErrors.content && (
-              <p className={GetDemoStyles.controlErrorMsg}>
-                {controlErrors.content.message}
-              </p>
-            )}
-          </div>
-          <div className={GetDemoStyles.formControlContainer}>
-            <label htmlFor="content" className={GetDemoStyles.formControlLabel}>
-              Enter Tutor Type
-            </label>
-            <input
-              type="text"
-              name="tutor"
-              id="tutor"
-              placeholder="Enter Tutor Type"
-              required
-              className={`${GetDemoStyles.formControl} ${
-                controlErrors.tutor && GetDemoStyles.controlError
-              }`}
-              onInput={(event) => validateTutor(event.currentTarget.value)}
-            />
-            {controlErrors.tutor && (
-              <p className={GetDemoStyles.controlErrorMsg}>
-                {controlErrors.tutor.message}
-              </p>
-            )}
-          </div>
-          <PurpleButton type="submit" className={GetDemoStyles.formSubmitBtn}>
-            Submit
-          </PurpleButton>
-        </form>
-      )}
-    </main>
+    <React.Fragment>
+      {isSubmitting && <Loader />}
+      <main className={GetDemoStyles.getDemoMain}>
+        {formSubmitted ? (
+          <AudioControl
+            transcript={transcript}
+            setTranscript={setTranscript}
+            aiAudio={aiAudio}
+            setAiAudio={setAiAudio}
+          />
+        ) : (
+          <form
+            noValidate
+            autoComplete="off"
+            onSubmit={handleFormSubmit}
+            className={GetDemoStyles.formBody}
+          >
+            <div className={GetDemoStyles.formControlContainer}>
+              <label
+                htmlFor="content"
+                className={GetDemoStyles.formControlLabel}
+              >
+                Enter Content
+              </label>
+              <textarea
+                name="content"
+                id="content"
+                placeholder="Enter content..."
+                required
+                className={`${GetDemoStyles.formControl} ${
+                  controlErrors.content && GetDemoStyles.controlError
+                }`}
+                onInput={(event) => validateContent(event.currentTarget.value)}
+              />
+              {controlErrors.content && (
+                <p className={GetDemoStyles.controlErrorMsg}>
+                  {controlErrors.content.message}
+                </p>
+              )}
+            </div>
+            <div className={GetDemoStyles.formControlContainer}>
+              <label
+                htmlFor="content"
+                className={GetDemoStyles.formControlLabel}
+              >
+                Enter Tutor Type
+              </label>
+              <input
+                type="text"
+                name="tutor"
+                id="tutor"
+                placeholder="Enter Tutor Type"
+                required
+                className={`${GetDemoStyles.formControl} ${
+                  controlErrors.tutor && GetDemoStyles.controlError
+                }`}
+                onInput={(event) => validateTutor(event.currentTarget.value)}
+              />
+              {controlErrors.tutor && (
+                <p className={GetDemoStyles.controlErrorMsg}>
+                  {controlErrors.tutor.message}
+                </p>
+              )}
+            </div>
+            <PurpleButton
+              type="submit"
+              className={GetDemoStyles.formSubmitBtn}
+              disabled={isSubmitting}
+            >
+              Submit
+            </PurpleButton>
+          </form>
+        )}
+      </main>
+    </React.Fragment>
   );
 };
