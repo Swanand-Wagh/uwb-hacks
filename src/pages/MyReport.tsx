@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import AudioControlStyles from "@/styles/components/audio/audioControl.module.css";
 import { useNavigate } from "react-router-dom";
 
 interface ResponseData {
@@ -17,7 +16,7 @@ interface ResponseData {
 
 const MyReport: React.FC = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<ResponseData[]>();
+  const [responses, setResponses] = useState<ResponseData[]>([]);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -29,8 +28,8 @@ const MyReport: React.FC = () => {
           return;
         }
 
-        const data = (await response.json()) as ResponseData[];
-        setData(data);
+        const data = await response.json();
+        setResponses(data.responses);
       } catch (error) {
         console.error(error);
       }
@@ -41,33 +40,53 @@ const MyReport: React.FC = () => {
 
   return (
     <>
-      <section className={AudioControlStyles.reportContainer}>
-        {data?.map((response, index) => (
-          <div className={AudioControlStyles.reportCard} key={index}>
-            <h2 className={AudioControlStyles.question}>
+      <section
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {responses.map((response, index) => (
+          <div
+            key={index}
+            style={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "16px",
+              margin: "16px",
+              maxWidth: "600px",
+              width: "100%",
+            }}
+          >
+            <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>
               {response.questionText}
             </h2>
-            <p className={AudioControlStyles.responseText}>
-              {response.responseText}
-            </p>
-            <div className={AudioControlStyles.grades}>
+            <p style={{ marginBottom: "12px" }}>{response.responseText}</p>
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
               {Object.entries(response.grades).map(
                 ([category, { analysis, grade }], idx) => (
-                  <div className={AudioControlStyles.gradeItem} key={idx}>
-                    <h3 className={AudioControlStyles.gradeCategory}>
+                  <div
+                    key={idx}
+                    style={{
+                      border: "1px solid #ccc",
+                      borderRadius: "8px",
+                      padding: "8px",
+                      margin: "4px",
+                      minWidth: "200px",
+                      display: "inline-block",
+                    }}
+                  >
+                    <h3 style={{ fontSize: "16px", marginBottom: "4px" }}>
                       {category}
                     </h3>
-                    <p className={AudioControlStyles.gradeAnalysis}>
-                      {analysis}
-                    </p>
-                    <p
-                      className={AudioControlStyles.grade}
-                    >{`Grade: ${grade}`}</p>
+                    <p style={{ marginBottom: "4px" }}>{analysis}</p>
+                    <p style={{ marginBottom: "4px" }}>Grade: {grade}</p>
                   </div>
                 )
               )}
             </div>
-            <p className={AudioControlStyles.feedback}>{response.feedback}</p>
+            <p style={{ fontStyle: "italic" }}>{response.feedback}</p>
           </div>
         ))}
       </section>

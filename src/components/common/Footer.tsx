@@ -6,10 +6,13 @@ export const Footer: React.FC = (): JSX.Element => {
   return (
     <footer className={FooterStyles.appFooter}>
       <div className={FooterStyles.footerSections}>
-        <span className={FooterStyles.footerSectionHeadings}>Smart Interview Prep</span>
+        <span className={FooterStyles.footerSectionHeadings}>
+          Smart Tutoring
+        </span>
         <p className={FooterStyles.footerSectionTexts}>
-          Interview AI aims to revolutionize the interview preparation process by leveraging advanced technology to
-          provide personalized guidance and feedback.
+         Socraitive aims to revolutionize the learning process
+          by leveraging advanced technology to provide personalized guidance and
+          feedback.
         </p>
       </div>
       <nav className={FooterStyles.footerSections}>
@@ -33,8 +36,11 @@ export const Footer: React.FC = (): JSX.Element => {
         </ul>
       </nav>
       <div className={FooterStyles.footerSectionDivider}></div>
-      <small className={`${FooterStyles.footerSectionTexts} ${FooterStyles.footerCopyrightText}`}>
-        2024 &copy; All Rights Reserved | Designed and Developed by <span>Swanand, Andres & Hayden</span>
+      <small
+        className={`${FooterStyles.footerSectionTexts} ${FooterStyles.footerCopyrightText}`}
+      >
+        2024 &copy; All Rights Reserved | Designed and Developed by{" "}
+        <span>Swanand, Andres & Hayden</span>
       </small>
     </footer>
   );
